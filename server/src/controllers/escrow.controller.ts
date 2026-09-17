@@ -1,15 +1,8 @@
 import type { Request, Response } from "express";
-import { listEscrowsForUser, getEscrowWithMilestones } from "../services/escrow.service.js";
+import { cancelEscrowTransaction, createEscrowTransaction, createMilestoneTransaction, releaseMilestoneTransaction, syncEscrow } from "../services/escrow.service.js";
 
-export async function listEscrows(req: Request, res: Response) {
-  const data = await listEscrowsForUser(req.auth!.userId);
-  return res.json({ escrows: data });
-}
-
-export async function getSingleEscrow(req: Request, res: Response) {
-  const data = await getEscrowWithMilestones(req.params.address);
-  if (!data) {
-    return res.status(404).json({ error: "Escrow not found" });
-  }
-  return res.json(data);
-}
+export async function buildCreateEscrow(req: Request, res: Response) { const result = await createEscrowTransaction(req.auth!.userId, req.body); return res.status(200).json(result); }
+export async function buildCreateMilestone(req: Request, res: Response) { const result = await createMilestoneTransaction(req.auth!.userId, req.params.address, req.body); return res.json(result); }
+export async function buildReleaseMilestone(req: Request, res: Response) { const result = await releaseMilestoneTransaction(req.auth!.userId, req.params.address, req.body); return res.json(result); }
+export async function buildCancelEscrow(req: Request, res: Response) { const result = await cancelEscrowTransaction(req.auth!.userId, req.params.address); return res.json(result); }
+export async function syncOnChainEscrow(req: Request, res: Response) { const result = await syncEscrow(req.auth!.userId, req.params.address, (req.body as { signature: string }).signature); return res.json({ escrow: result }); }

@@ -1,10 +1,12 @@
 import { Router } from "express";
 import { requireAuth } from "../middleware/auth.middleware.js";
 import { getSingleEscrow, listEscrows } from "../controllers/escrow.controller.js";
-
-const router = Router();
-router.use(requireAuth);
-router.get("/", listEscrows);
-router.get("/:address", getSingleEscrow);
-
+import { buildCreateEscrow, buildCreateMilestone, buildReleaseMilestone, buildCancelEscrow, syncOnChainEscrow } from "../controllers/escrow.controller.js";
+const router = Router(); router.use(requireAuth);
+router.get("/", listEscrows); router.get("/:address", getSingleEscrow);
+router.post("/transactions/create", buildCreateEscrow);
+router.post("/:address/transactions/milestones", buildCreateMilestone);
+router.post("/:address/transactions/release", buildReleaseMilestone);
+router.post("/:address/transactions/cancel", buildCancelEscrow);
+router.post("/:address/sync", syncOnChainEscrow);
 export default router;
