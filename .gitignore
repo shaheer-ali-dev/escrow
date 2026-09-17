@@ -1,5 +1,6 @@
 server/node_modules/
 server/dist/
 server/.env
-target/
 .env
+.DS_Store
+target/

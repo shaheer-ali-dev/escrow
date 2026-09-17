@@ -1,4 +1,30 @@
 import mongoose, { Schema } from "mongoose";
-export interface WalletAnalyticsDoc { walletAddress: string; transactionCount: number; firstObservedAt?: Date; lastObservedAt?: Date; tradingVolumeLamports?: string; realizedPnlLamports?: string; coveragePercent?: number; riskSignals: Array<{ code: string; description: string; source?: string; evidenceSignatures: string[]; observedAt: Date }>; calculatedAt?: Date; }
-const schema = new Schema<WalletAnalyticsDoc>({ walletAddress: { type: String, unique: true, index: true, required: true }, transactionCount: { type: Number, default: 0 }, firstObservedAt: Date, lastObservedAt: Date, tradingVolumeLamports: String, realizedPnlLamports: String, coveragePercent: Number, riskSignals: { type: [Schema.Types.Mixed], default: [] }, calculatedAt: Date }, { timestamps: true });
-export const WalletAnalytics = mongoose.model<WalletAnalyticsDoc>("WalletAnalytics", schema);
+
+export interface WalletAnalyticsDoc {
+  walletAddress: string;
+  transactionCount: number;
+  firstObservedAt?: Date;
+  lastObservedAt?: Date;
+  tradingVolumeLamports?: string;
+  realizedPnlLamports?: string;
+  coveragePercent?: number;
+  riskSignals: Array<{ code: string; description: string; source?: string; evidenceSignatures: string[]; observedAt: Date }>;
+  calculatedAt?: Date;
+}
+
+const walletAnalyticsSchema = new Schema<WalletAnalyticsDoc>(
+  {
+    walletAddress: { type: String, unique: true, index: true, required: true },
+    transactionCount: { type: Number, default: 0 },
+    firstObservedAt: Date,
+    lastObservedAt: Date,
+    tradingVolumeLamports: String,
+    realizedPnlLamports: String,
+    coveragePercent: Number,
+    riskSignals: { type: [Schema.Types.Mixed], default: [] },
+    calculatedAt: Date,
+  },
+  { timestamps: true }
+);
+
+export const WalletAnalytics = mongoose.model<WalletAnalyticsDoc>("WalletAnalytics", walletAnalyticsSchema);
