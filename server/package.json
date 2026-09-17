@@ -1,0 +1,8 @@
+{
+  "name": "blocksub-escrow-server",
+  "private": true,
+  "type": "module",
+  "scripts": { "typecheck": "tsc --noEmit" },
+  "dependencies": { "@coral-xyz/anchor": "0.29.0", "@solana/web3.js": "^1.98.4" },
+  "devDependencies": { "@types/node": "^20.0.0", "typescript": "^5.6.3" }
+}

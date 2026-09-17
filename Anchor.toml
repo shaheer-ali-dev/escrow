@@ -1,0 +1,17 @@
+[features]
+seeds = false
+skip-lint = false
+
+[programs.devnet]
+blocksub = "REPLACE_WITH_PROGRAM_ID"
+
+[provider]
+cluster = "devnet"
+wallet = "~/.config/solana/id.json"
+
+[workspace]
+programs = ["programs/blocksub"]
+
+[toolchain]
+anchor_version = "0.29.0"
+solana_version = "1.18.17"
