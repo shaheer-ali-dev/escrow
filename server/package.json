@@ -2,7 +2,7 @@
   "name": "blocksub-escrow-server",
   "private": true,
   "type": "module",
-  "scripts": { "typecheck": "tsc --noEmit" },
-  "dependencies": { "@coral-xyz/anchor": "0.29.0", "@solana/web3.js": "^1.98.4" },
-  "devDependencies": { "@types/node": "^20.0.0", "typescript": "^5.6.3" }
+  "scripts": { "dev": "tsx src/index.ts", "start": "node dist/index.js", "build": "tsc", "typecheck": "tsc --noEmit" },
+  "dependencies": { "@solana/web3.js": "^1.98.4", "bcryptjs": "^2.4.3", "cors": "^2.8.5", "dotenv": "^16.4.7", "express": "^4.21.2", "express-rate-limit": "^7.5.0", "helmet": "^8.1.0", "jsonwebtoken": "^9.0.2", "mongoose": "^8.18.3", "nacl": "^0.6.0", "tweetnacl": "^1.0.3", "zod": "^3.24.2" },
+  "devDependencies": { "@types/bcryptjs": "^2.4.6", "@types/cors": "^2.8.17", "@types/express": "^5.0.0", "@types/jsonwebtoken": "^9.0.7", "@types/node": "^20.16.11", "tsx": "^4.19.2", "typescript": "^5.6.3" }
 }
