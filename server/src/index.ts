@@ -7,8 +7,9 @@ import { connectDatabase } from "./config/database.js";
 import { env } from "./config/env.js";
 import authRoutes from "./routes/auth.routes.js";
 import profileRoutes from "./routes/profile.routes.js";
-import escrowRoutes from "./routes/escrow.routes.js";
+import escrowRoutes from "./routes/escrow-full.routes.js";
 import reputationRoutes from "./routes/reputation.routes.js";
+import workSubmissionRoutes from "./routes/work-submission.routes.js";
 import { startIndexer } from "./services/indexer.worker.js";
 import { notFound, errorHandler } from "./middleware/error.middleware.js";
 
@@ -24,15 +25,18 @@ app.get("/health", (_req, res) => res.json({ status: "ok" }));
 
 app.use("/api/auth", authRoutes);
 app.use("/api/profile", profileRoutes);
-app.use("/api/escrow", escrowRoutes); // fixed: was "/api/escrows", didn't match your endpoints
+app.use("/api/escrow", escrowRoutes);
 app.use("/api/reputation", reputationRoutes);
+app.use("/api/work-submissions", workSubmissionRoutes);
 
 app.use(notFound);
-app.use(errorHandler); // single error handler — removed the duplicate inline one
+app.use(errorHandler);
 
 async function start() {
   await connectDatabase();
-  startIndexer();
+  if (env.ENABLE_INDEXER) {
+    startIndexer();
+  }
   app.listen(env.PORT, () => console.log(`API listening on :${env.PORT}`));
 }
 
