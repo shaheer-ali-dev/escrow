@@ -1,5 +1,5 @@
 [workspace]
-members = ["programs/blocksub"]
+members = ["programs/proofly"]
 resolver = "2"
 
 [profile.release]
