@@ -1,4 +1,9 @@
-import { PublicKey, type ParsedConfirmedTransaction, type SignaturesForAddressOptions } from "@solana/web3.js";
+import { 
+  PublicKey, 
+  type SignaturesForAddressOptions, 
+  ParsedTransactionWithMeta,
+  type ParsedConfirmedTransaction 
+} from "@solana/web3.js";
 import { connection } from "../blockchain/program.js";
 import { WalletAnalytics } from "../models/wallet-analytics.model.js";
 import { ChainEvent } from "../models/chain-event.model.js";
@@ -45,7 +50,7 @@ export async function scanWallet(address: string): Promise<WalletScan> {
   const confirmed = signatures.filter((item) => !item.err);
   const transactions = await connection.getParsedConfirmedTransactions(
     confirmed.map((item) => item.signature),
-    { commitment: "confirmed", maxSupportedTransactionVersion: 0 }
+    "confirmed"
   );
 
   let incoming = 0n;
@@ -66,7 +71,10 @@ export async function scanWallet(address: string): Promise<WalletScan> {
     evidenceSignatures.push(transaction.transaction.signatures[0]);
   }
 
-  const times = transactions.map(transactionTime).filter((value): value is Date => value !== null);
+  const times = transactions
+    .filter((tx): tx is ParsedConfirmedTransaction => tx !== null)
+    .map(transactionTime)
+    .filter((value): value is Date => value !== null);
   const firstObservedAt = times.length ? new Date(Math.min(...times.map((value) => value.getTime()))) : null;
   const lastObservedAt = times.length ? new Date(Math.max(...times.map((value) => value.getTime()))) : null;
   const balance = await connection.getBalance(publicKey, "confirmed");

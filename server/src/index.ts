@@ -1,5 +1,5 @@
 import "dotenv/config";
-import express from "express";
+import express, { type Request, type Response, type NextFunction } from "express";
 import cors from "cors";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
@@ -11,4 +11,32 @@ import escrowRoutes from "./routes/escrow.routes.js";
 import reputationRoutes from "./routes/reputation.routes.js";
 import { startIndexer } from "./services/indexer.worker.js";
 import { notFound, errorHandler } from "./middleware/error.middleware.js";
-const app = express(); app.disable("x-powered-by"); app.use(helmet()); app.use(cors({ origin: env.CLIENT_ORIGIN, credentials: true })); app.use(express.json({ limit: "100kb" })); app.use(rateLimit({ windowMs: 900000, limit: 200, standardHeaders: true })); app.get("/health", (_req, res) => res.json({ status: "ok" })); app.use("/api/auth", authRoutes); app.use("/api/profile", profileRoutes); app.use("/api/escrows", escrowRoutes); app.use("/api/reputation", reputationRoutes); app.use(notFound); app.use(errorHandler); await connectDatabase(); startIndexer(); app.listen(env.PORT, () => console.log(`API listening on :${env.PORT}`));
+
+const app = express();
+
+app.disable("x-powered-by");
+app.use(helmet());
+app.use(cors({ origin: env.CLIENT_ORIGIN, credentials: true }));
+app.use(express.json({ limit: "100kb" }));
+app.use(rateLimit({ windowMs: 900000, limit: 200, standardHeaders: true }));
+
+app.get("/health", (_req, res) => res.json({ status: "ok" }));
+
+app.use("/api/auth", authRoutes);
+app.use("/api/profile", profileRoutes);
+app.use("/api/escrow", escrowRoutes); // fixed: was "/api/escrows", didn't match your endpoints
+app.use("/api/reputation", reputationRoutes);
+
+app.use(notFound);
+app.use(errorHandler); // single error handler — removed the duplicate inline one
+
+async function start() {
+  await connectDatabase();
+  startIndexer();
+  app.listen(env.PORT, () => console.log(`API listening on :${env.PORT}`));
+}
+
+start().catch((error) => {
+  console.error("Failed to start server:", error);
+  process.exit(1);
+});

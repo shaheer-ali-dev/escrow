@@ -1,0 +1,494 @@
+{
+  "version": "0.1.0",
+  "name": "proofly",
+  "instructions": [
+    {
+      "name": "createEscrow",
+      "accounts": [
+        {
+          "name": "escrow",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "vault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "client",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "freelancer",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "totalAmount",
+          "type": "u64"
+        },
+        {
+          "name": "milestoneCount",
+          "type": "u8"
+        },
+        {
+          "name": "deadline",
+          "type": "i64"
+        }
+      ]
+    },
+    {
+      "name": "createMilestone",
+      "accounts": [
+        {
+          "name": "escrow",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "milestone",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "client",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "index",
+          "type": "u8"
+        },
+        {
+          "name": "amount",
+          "type": "u64"
+        },
+        {
+          "name": "dueAt",
+          "type": "i64"
+        }
+      ]
+    },
+    {
+      "name": "releaseMilestone",
+      "accounts": [
+        {
+          "name": "escrow",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "milestone",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "vault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "client",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "freelancer",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "cancelEscrow",
+      "accounts": [
+        {
+          "name": "escrow",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "vault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "client",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "closeCompletedEscrow",
+      "accounts": [
+        {
+          "name": "escrow",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "vault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "client",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Escrow",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "client",
+            "type": "publicKey"
+          },
+          {
+            "name": "freelancer",
+            "type": "publicKey"
+          },
+          {
+            "name": "totalAmount",
+            "type": "u64"
+          },
+          {
+            "name": "allocatedAmount",
+            "type": "u64"
+          },
+          {
+            "name": "releasedAmount",
+            "type": "u64"
+          },
+          {
+            "name": "milestoneCount",
+            "type": "u8"
+          },
+          {
+            "name": "completedMilestones",
+            "type": "u8"
+          },
+          {
+            "name": "createdAt",
+            "type": "i64"
+          },
+          {
+            "name": "deadline",
+            "type": "i64"
+          },
+          {
+            "name": "status",
+            "type": "u8"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Milestone",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "escrow",
+            "type": "publicKey"
+          },
+          {
+            "name": "index",
+            "type": "u8"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "dueAt",
+            "type": "i64"
+          },
+          {
+            "name": "status",
+            "type": "u8"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Vault",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "escrow",
+            "type": "publicKey"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    }
+  ],
+  "types": [
+    {
+      "name": "EscrowStatus",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Active"
+          },
+          {
+            "name": "Completed"
+          },
+          {
+            "name": "Cancelled"
+          }
+        ]
+      }
+    },
+    {
+      "name": "MilestoneStatus",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Pending"
+          },
+          {
+            "name": "Released"
+          },
+          {
+            "name": "Cancelled"
+          }
+        ]
+      }
+    }
+  ],
+  "events": [
+    {
+      "name": "EscrowCreated",
+      "fields": [
+        {
+          "name": "escrow",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "client",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "freelancer",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "totalAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "milestoneCount",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "deadline",
+          "type": "i64",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "MilestoneCreated",
+      "fields": [
+        {
+          "name": "escrow",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "index",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "amount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "dueAt",
+          "type": "i64",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "MilestoneReleased",
+      "fields": [
+        {
+          "name": "escrow",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "milestoneIndex",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "freelancer",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "amount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "releasedAt",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "escrowCompleted",
+          "type": "bool",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "EscrowCancelled",
+      "fields": [
+        {
+          "name": "escrow",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "client",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "refundAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "cancelledAt",
+          "type": "i64",
+          "index": false
+        }
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "InvalidAmount",
+      "msg": "Amount must be greater than zero"
+    },
+    {
+      "code": 6001,
+      "name": "InvalidMilestoneCount",
+      "msg": "Milestone count must be greater than zero"
+    },
+    {
+      "code": 6002,
+      "name": "InvalidParties",
+      "msg": "Client and freelancer must be different"
+    },
+    {
+      "code": 6003,
+      "name": "InvalidDeadline",
+      "msg": "Deadline is invalid"
+    },
+    {
+      "code": 6004,
+      "name": "EscrowNotActive",
+      "msg": "Escrow is not active"
+    },
+    {
+      "code": 6005,
+      "name": "EscrowNotCompleted",
+      "msg": "Escrow is not completed"
+    },
+    {
+      "code": 6006,
+      "name": "InvalidMilestoneIndex",
+      "msg": "Milestone index is invalid"
+    },
+    {
+      "code": 6007,
+      "name": "MilestoneNotPending",
+      "msg": "Milestone is not pending"
+    },
+    {
+      "code": 6008,
+      "name": "MilestonesExceedTotal",
+      "msg": "Milestone allocations exceed total escrow amount"
+    },
+    {
+      "code": 6009,
+      "name": "MilestonesNotFullyAllocated",
+      "msg": "All milestones must be allocated before completion"
+    },
+    {
+      "code": 6010,
+      "name": "ReleaseExceedsTotal",
+      "msg": "Released amount exceeds total escrow amount"
+    },
+    {
+      "code": 6011,
+      "name": "ReleaseDoesNotCompleteEscrow",
+      "msg": "Final release does not complete escrow"
+    },
+    {
+      "code": 6012,
+      "name": "InsufficientVaultBalance",
+      "msg": "Vault has insufficient lamports"
+    },
+    {
+      "code": 6013,
+      "name": "Overflow",
+      "msg": "Arithmetic overflow"
+    }
+  ]
+}

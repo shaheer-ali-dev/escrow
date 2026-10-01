@@ -2,27 +2,23 @@ import mongoose, { Schema } from "mongoose";
 
 export interface WalletAnalyticsDoc {
   walletAddress: string;
-  transactionCount: number;
-  firstObservedAt?: Date;
-  lastObservedAt?: Date;
-  tradingVolumeLamports?: string;
-  realizedPnlLamports?: string;
-  coveragePercent?: number;
-  riskSignals: Array<{ code: string; description: string; source?: string; evidenceSignatures: string[]; observedAt: Date }>;
-  calculatedAt?: Date;
+  riskScore?: number;
+  riskLevel?: "low" | "medium" | "high";
+  riskSignals?: any[];
+  estimatedBalance?: string;
+  transactionPattern?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 const walletAnalyticsSchema = new Schema<WalletAnalyticsDoc>(
   {
-    walletAddress: { type: String, unique: true, index: true, required: true },
-    transactionCount: { type: Number, default: 0 },
-    firstObservedAt: Date,
-    lastObservedAt: Date,
-    tradingVolumeLamports: String,
-    realizedPnlLamports: String,
-    coveragePercent: Number,
+    walletAddress: { type: String, required: true, unique: true, index: true },
+    riskScore: { type: Number, default: 0 },
+    riskLevel: { type: String, enum: ["low", "medium", "high"], default: "low" },
     riskSignals: { type: [Schema.Types.Mixed], default: [] },
-    calculatedAt: Date,
+    estimatedBalance: String,
+    transactionPattern: String,
   },
   { timestamps: true }
 );
