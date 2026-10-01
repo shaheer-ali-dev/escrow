@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 use solana_program::{program::invoke, system_instruction};
 
-declare_id!("REPLACE_WITH_PROGRAM_ID");
+declare_id!("G9Fc28faoqwHW6BMCskBPbzLTF3Cu7j4SZAbVJxgwgAG");
 
 const ESCROW_SEED: &[u8] = b"escrow";
 const VAULT_SEED: &[u8] = b"vault";
