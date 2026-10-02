@@ -1,5 +1,5 @@
 import "dotenv/config";
-import express from "express";
+import express, { type Request, type Response, type NextFunction } from "express";
 import cors from "cors";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
@@ -11,6 +11,8 @@ import escrowRoutes from "./routes/escrow-full.routes.js";
 import reputationRoutes from "./routes/reputation.routes.js";
 import workSubmissionRoutes from "./routes/work-submission.routes.js";
 import evaluationRoutes from "./routes/evaluation.routes.js";
+import messageRoutes from "./routes/message.routes.js";
+import freelancerRoutes from "./routes/freelancer.routes.js";
 import { startIndexer } from "./services/indexer.worker.js";
 import { notFound, errorHandler } from "./middleware/error.middleware.js";
 
@@ -30,6 +32,8 @@ app.use("/api/escrow", escrowRoutes);
 app.use("/api/reputation", reputationRoutes);
 app.use("/api/work-submissions", workSubmissionRoutes);
 app.use("/api/evaluations", evaluationRoutes);
+app.use("/api/messages", messageRoutes);
+app.use("/api/freelancers", freelancerRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
