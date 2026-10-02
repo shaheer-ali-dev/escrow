@@ -1,5 +1,6 @@
-import { Attestation } from "../models/attestation.model.js";
 import crypto from "crypto";
+import { Attestation } from "../models/attestation.model.js";
+import { env } from "../config/env.js";
 
 export async function createAttestation(
   milestoneId: string,
@@ -8,12 +9,28 @@ export async function createAttestation(
   policyDecision: "auto_release" | "manual_review" | "hold",
   payload: Record<string, any>
 ) {
+  const attestationPayload = {
+    milestoneId,
+    escrowAddress,
+    evaluationId,
+    policyDecision,
+    payload,
+    createdAt: new Date().toISOString(),
+  };
+
+  const signature = crypto
+    .createHmac("sha256", env.JWT_SECRET)
+    .update(JSON.stringify(attestationPayload))
+    .digest("hex");
+
   return Attestation.create({
     milestoneId,
     escrowAddress,
     evaluationId,
     policyDecision,
-    attestationPayload: payload,
+    attestationPayload,
+    signature,
+    verificationKey: "hmac-sha256",
     status: "pending",
   });
 }
