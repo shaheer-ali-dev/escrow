@@ -1,5 +1,9 @@
-import { Evidence } from "../models/evidence.model.js";
 import crypto from "crypto";
+import { Evidence } from "../models/evidence.model.js";
+
+function stableHash(input: Record<string, any>) {
+  return crypto.createHash("sha256").update(JSON.stringify(input)).digest("hex");
+}
 
 export async function submitEvidence(
   milestoneId: string,
@@ -8,10 +12,14 @@ export async function submitEvidence(
   evidenceUri: string,
   metadata: Record<string, any>
 ) {
-  const evidenceHash = crypto
-    .createHash("sha256")
-    .update(`${milestoneId}${evidenceUri}${Date.now()}`)
-    .digest("hex");
+  const normalizedMetadata = metadata ?? {};
+  const evidenceHash = stableHash({
+    milestoneId,
+    escrowAddress,
+    evidenceUri,
+    metadata: normalizedMetadata,
+    submittedBy,
+  });
 
   return Evidence.create({
     milestoneId,
@@ -19,13 +27,17 @@ export async function submitEvidence(
     submittedBy,
     evidenceUri,
     evidenceHash,
-    metadata,
+    metadata: normalizedMetadata,
     status: "pending",
   });
 }
 
 export async function getEvidence(milestoneId: string) {
-  return Evidence.find({ milestoneId }).lean();
+  return Evidence.find({ milestoneId }).sort({ createdAt: -1 }).lean();
+}
+
+export async function getEvidenceById(evidenceId: string) {
+  return Evidence.findById(evidenceId).lean();
 }
 
 export async function verifyEvidence(evidenceId: string) {
@@ -36,10 +48,16 @@ export async function verifyEvidence(evidenceId: string) {
   );
 }
 
-export async function rejectEvidence(evidenceId: string) {
+export async function rejectEvidence(evidenceId: string, reason?: string) {
   return Evidence.findByIdAndUpdate(
     evidenceId,
-    { status: "rejected" },
+    {
+      status: "rejected",
+      metadata: {
+        ...(reason ? { rejectionReason: reason } : {}),
+      },
+      verifiedAt: null,
+    },
     { new: true }
   );
 }
